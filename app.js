@@ -1,6 +1,6 @@
 (() => {
 'use strict';
-const VERSION='2.0.1', STORAGE_KEY='hooptrack-v1';
+const VERSION='2.0.3', STORAGE_KEY='hooptrack-v1';
 const basePeriod=()=>({ftMade:0,ftMiss:0,twoMade:0,twoMiss:0,threeMade:0,threeMiss:0,assists:0,rebounds:0,steals:0,blocks:0,turnovers:0,fouls:0});
 const initial={games:[],activeGameId:null,playerName:'',seasonName:'',leagueName:'',teamName:'',settings:{theme:'system',haptics:true,wakeLock:true,playTime:false},filters:{dashboardSeason:'',dashboardLeague:'',season:'',seasonLeague:'',historySeason:'',historyLeague:'',historySort:'newest',favoritesOnly:false,historySearch:''}};
 const clone=o=>JSON.parse(JSON.stringify(o));
