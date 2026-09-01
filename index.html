@@ -70,6 +70,15 @@
 
         <section class="card playtime-card"><div><div class="eyebrow">PLAYING TIME</div><h3 id="playTime">0:00</h3><div id="playStatus" class="muted small">Timer off</div></div><button id="togglePlayBtn" class="secondary" type="button">IN GAME</button></section>
 
+        <section class="card settings-form">
+          <div class="card-head"><div><div class="eyebrow">FINAL SCORE</div><h3>Game result</h3></div><span id="finalScoreSaved" class="muted small">Saved</span></div>
+          <div class="final-score-grid">
+            <label>Your team<input id="teamScoreInput" type="number" min="0" inputmode="numeric" placeholder="Score"></label>
+            <label>Opponent<input id="opponentScoreInput" type="number" min="0" inputmode="numeric" placeholder="Score"></label>
+          </div>
+          <button id="saveFinalScoreBtn" class="secondary" type="button">Save final score</button>
+        </section>
+
         <section class="card"><div class="card-head"><h3>Game notes</h3><span id="notesSaved" class="muted small">Saved</span></div><textarea id="gameNotes" rows="7" placeholder="Add observations, matchups, highlights, coaching notes…"></textarea></section>
 
         <section class="card"><div class="card-head"><h3>Period breakdown</h3></div><div class="table-wrap"><table><thead><tr><th>Period</th><th>PTS</th><th>FG</th><th>3PT</th><th>FT</th><th>AST</th><th>REB</th><th>STL</th><th>BLK</th><th>TO</th><th>PF</th></tr></thead><tbody id="periodTableBody"></tbody></table></div></section>
@@ -119,7 +128,7 @@
 
   <dialog id="newGameDialog"><form method="dialog" id="newGameForm" class="dialog-card"><div class="card-head"><div><div class="eyebrow">NEW GAME</div><h2>Create game</h2></div><button class="icon-btn" value="cancel" aria-label="Close">×</button></div><label>Opponent<input id="opponentInput" required autofocus></label><label>Date<input id="gameDateInput" type="date" required></label><label>Season<input id="gameSeasonInput"></label><label>League<input id="gameLeagueInput"></label><label>Team<input id="gameTeamInput"></label><div class="button-row"><button class="secondary" value="cancel" type="button" id="cancelNewGame">Cancel</button><button class="primary" type="submit">Start game</button></div></form></dialog>
 
-  <dialog id="summaryDialog"><div class="dialog-card wide"><div class="card-head"><div><div class="eyebrow">GAME SUMMARY</div><h2 id="summaryTitle"></h2></div><button id="closeSummary" class="icon-btn" aria-label="Close">×</button></div><div id="summaryBadges" class="badge-row"></div><div id="summaryStats" class="stat-grid six"></div><div id="summaryShooting" class="summary-block"></div><div id="summaryPeriods" class="table-wrap"></div><div id="summaryNotesWrap" class="summary-block hidden"><h3>Notes</h3><p id="summaryNotes"></p></div><div class="button-row"><button id="summaryShare" class="icon-action" type="button" title="Share" aria-label="Share">↗</button><button id="summaryResume" class="secondary" type="button">Resume</button><button id="summaryDone" class="primary" type="button">Done</button></div></div></dialog>
+  <dialog id="summaryDialog"><div class="dialog-card wide"><div class="card-head"><div><div class="eyebrow">GAME SUMMARY</div><h2 id="summaryTitle"></h2></div><button id="closeSummary" class="icon-btn" aria-label="Close">×</button></div><div id="summaryBadges" class="badge-row"></div><div id="summaryFinalScore" class="summary-block hidden"></div><div id="summaryStats" class="stat-grid six"></div><div id="summaryShooting" class="summary-block"></div><div id="summaryPeriods" class="table-wrap"></div><div id="summaryNotesWrap" class="summary-block hidden"><h3>Notes</h3><p id="summaryNotes"></p></div><div class="button-row"><button id="summaryShare" class="icon-action" type="button" title="Share" aria-label="Share">↗</button><button id="summaryResume" class="secondary" type="button">Resume</button><button id="summaryDone" class="primary" type="button">Done</button></div></div></dialog>
 
   <dialog id="rewardDialog"><div class="reward-card"><div id="rewardIcon" class="reward-icon">🏆</div><div id="rewardEyebrow" class="eyebrow">ACHIEVEMENT</div><h2 id="rewardTitle"></h2><p id="rewardMessage"></p><button id="rewardClose" class="primary" type="button">Nice!</button></div></dialog>
 
