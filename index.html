@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b1220">
+  <meta name="description" content="HoopTrack one-player basketball game and season stat tracker">
+  <title>HoopTrack</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/icon-192.png">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand-wrap">
+        <img src="./icons/icon-192.png" class="brand-icon" alt="">
+        <div><div class="brand">HoopTrack <span class="version">v2.0</span></div><div id="headerContext" class="muted small">One-player basketball tracker</div></div>
+      </div>
+      <button id="quickThemeBtn" class="icon-btn" type="button" aria-label="Toggle theme" title="Toggle theme">◐</button>
+    </header>
+
+    <main>
+      <section id="homeView" class="view active">
+        <div class="hero card">
+          <div>
+            <div class="eyebrow">PLAYER PROFILE</div>
+            <h1 id="homePlayerName">Not set</h1>
+            <div class="profile-meta"><span id="homeSeasonName">No season</span><span>•</span><span id="homeLeagueName">No league</span><span>•</span><span id="homeTeamName">No team</span></div>
+          </div>
+          <button id="newGameBtn" class="primary big" type="button">+ New Game</button>
+        </div>
+
+        <div class="section-title"><div><div class="eyebrow">OVERVIEW</div><h2>Dashboard</h2></div><div class="filters-inline"><select id="dashboardSeasonFilter" aria-label="Season filter"></select><select id="dashboardLeagueFilter" aria-label="League filter"></select></div></div>
+        <div id="overviewStats" class="stat-grid six"></div>
+        <div class="grid-two">
+          <section class="card"><div class="card-head"><h3>Season highs</h3><span id="scopeLabel" class="pill">All games</span></div><div id="seasonHighs" class="highs-grid"></div></section>
+          <section class="card"><div class="card-head"><h3>Last 5 games</h3></div><div id="lastFiveStats" class="stat-grid compact"></div></section>
+        </div>
+        <section class="card"><div class="card-head"><h3>Performance trend</h3><select id="trendMetric"><option value="points">Points</option><option value="rebounds">Rebounds</option><option value="assists">Assists</option><option value="steals">Steals</option><option value="blocks">Blocks</option><option value="fgPct">FG%</option></select></div><div class="chart-wrap"><canvas id="trendCanvas" width="900" height="320" aria-label="Performance trend chart"></canvas></div></section>
+        <section class="card"><div class="card-head"><h3>Recent games</h3><button id="goHistoryBtn" class="text-btn" type="button">View all</button></div><div id="recentGames" class="game-list"></div></section>
+      </section>
+
+      <section id="gameView" class="view">
+        <div class="game-header card">
+          <div><div id="gameMeta" class="eyebrow"></div><h1 id="gameOpponent">Game</h1><div id="gameSubmeta" class="muted"></div></div>
+          <div class="live-score"><span>PTS</span><strong id="livePoints">0</strong></div>
+        </div>
+
+        <div class="period-bar" id="periodBar"></div>
+        <div id="liveStats" class="stat-grid seven live"></div>
+
+        <section class="card game-controls">
+          <div class="section-title compact-title"><div><div class="eyebrow">SCORING</div><h2>Shots</h2></div><div id="shootingLine" class="muted small"></div></div>
+          <div class="shot-grid">
+            <div class="shot-pair"><button class="score-btn made" data-stat="ftMade" type="button"><b>+1</b><span>FT Made</span></button><button class="score-btn miss" data-stat="ftMiss" type="button"><b>×</b><span>FT Miss</span></button></div>
+            <div class="shot-pair"><button class="score-btn made" data-stat="twoMade" type="button"><b>+2</b><span>2PT Made</span></button><button class="score-btn miss" data-stat="twoMiss" type="button"><b>×</b><span>2PT Miss</span></button></div>
+            <div class="shot-pair"><button class="score-btn made" data-stat="threeMade" type="button"><b>+3</b><span>3PT Made</span></button><button class="score-btn miss" data-stat="threeMiss" type="button"><b>×</b><span>3PT Miss</span></button></div>
+          </div>
+          <div class="count-grid">
+            <button data-stat="assists" class="count-btn" type="button"><span>AST</span><b id="btnAssists">0</b></button>
+            <button data-stat="rebounds" class="count-btn" type="button"><span>REB</span><b id="btnRebounds">0</b></button>
+            <button data-stat="steals" class="count-btn" type="button"><span>STL</span><b id="btnSteals">0</b></button>
+            <button data-stat="blocks" class="count-btn" type="button"><span>BLK</span><b id="btnBlocks">0</b></button>
+            <button data-stat="turnovers" class="count-btn secondary-stat" type="button"><span>TO</span><b id="btnTurnovers">0</b></button>
+            <button data-stat="fouls" class="count-btn secondary-stat" type="button"><span>PF</span><b id="btnFouls">0</b></button>
+          </div>
+        </section>
+
+        <section class="card playtime-card"><div><div class="eyebrow">PLAYING TIME</div><h3 id="playTime">0:00</h3><div id="playStatus" class="muted small">Timer off</div></div><button id="togglePlayBtn" class="secondary" type="button">IN GAME</button></section>
+
+        <section class="card"><div class="card-head"><h3>Game notes</h3><span id="notesSaved" class="muted small">Saved</span></div><textarea id="gameNotes" rows="7" placeholder="Add observations, matchups, highlights, coaching notes…"></textarea></section>
+
+        <section class="card"><div class="card-head"><h3>Period breakdown</h3></div><div class="table-wrap"><table><thead><tr><th>Period</th><th>PTS</th><th>FG</th><th>3PT</th><th>FT</th><th>AST</th><th>REB</th><th>STL</th><th>BLK</th><th>TO</th><th>PF</th></tr></thead><tbody id="periodTableBody"></tbody></table></div></section>
+
+        <section class="card"><div class="card-head"><h3>Game log</h3><button id="undoBtn" class="text-btn" type="button">Undo last</button></div><div id="eventLog" class="event-log"></div></section>
+
+        <div class="game-footer-actions"><button id="favoriteBtn" class="secondary" type="button">☆ Favorite</button><button id="endGameBtn" class="danger" type="button">End Game</button><button id="resumeGameBtn" class="primary hidden" type="button">Resume Game</button></div>
+      </section>
+
+      <section id="seasonView" class="view">
+        <div class="section-title"><div><div class="eyebrow">ANALYSIS</div><h1>Season</h1></div><div class="filters-inline"><select id="seasonFilter"></select><select id="seasonLeagueFilter"></select></div></div>
+        <div id="seasonSummary" class="stat-grid six"></div>
+        <section class="card"><div class="card-head"><h3>Recent form</h3><span class="muted small">Last 5 vs previous 5</span></div><div id="recentComparison" class="league-comparison"></div></section>
+        <section class="card"><div class="card-head"><h3>League comparison</h3></div><div id="leagueComparison" class="league-comparison"></div></section>
+        <section class="card"><div class="card-head"><h3>Achievements</h3></div><div id="achievementSummary" class="achievement-grid"></div></section>
+      </section>
+
+      <section id="historyView" class="view">
+        <div class="section-title"><div><div class="eyebrow">ALL GAMES</div><h1>History</h1></div><button id="compareBtn" class="secondary" type="button" disabled>Compare selected</button></div>
+        <div class="history-filters card"><input id="historySearch" type="search" placeholder="Search opponent or notes"><select id="historySeasonFilter"></select><select id="historyLeagueFilter"></select><select id="historySort"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="points">Points high → low</option><option value="opponent">Opponent A → Z</option></select><label class="check"><input id="favoritesOnly" type="checkbox"> Favorites only</label></div>
+        <div id="historyList" class="game-list"></div>
+      </section>
+
+      <section id="settingsView" class="view">
+        <div class="section-title"><div><div class="eyebrow">CONFIGURATION</div><h1>Settings</h1></div></div>
+        <form id="profileForm" class="card settings-form">
+          <h3>Defaults for new games</h3>
+          <label>Player name<input id="settingsPlayer" required></label>
+          <label>Season<input id="settingsSeason" placeholder="2026–27"></label>
+          <label>League<input id="settingsLeague" placeholder="AAU, School, Summer…"></label>
+          <label>Team<input id="settingsTeam" placeholder="Team name"></label>
+          <button class="primary" type="submit">Save profile</button>
+        </form>
+        <section class="card settings-form"><h3>Appearance & game behavior</h3><label>Theme<select id="themeSelect"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label><label class="switch-row"><span>Haptic feedback</span><input id="hapticsToggle" type="checkbox"></label><label class="switch-row"><span>Keep screen awake during games</span><input id="wakeLockToggle" type="checkbox"></label><label class="switch-row"><span>Track playing time</span><input id="playTimeToggle" type="checkbox"></label></section>
+        <section class="card settings-form"><h3>Data</h3><div class="button-row"><button id="backupBtn" class="secondary" type="button">Backup JSON</button><label class="secondary file-btn">Restore JSON<input id="restoreInput" type="file" accept="application/json,.json"></label><button id="csvBtn" class="secondary" type="button">Export CSV</button></div><p class="muted small">Backups include player profile, seasons, leagues, teams, games, notes, achievements, and settings.</p></section>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Primary">
+      <button data-view="home" class="active" type="button">⌂<span>Home</span></button>
+      <button data-view="game" type="button">●<span>Game</span></button>
+      <button data-view="season" type="button">▥<span>Season</span></button>
+      <button data-view="history" type="button">☷<span>History</span></button>
+      <button data-view="settings" type="button">⚙<span>Settings</span></button>
+    </nav>
+  </div>
+
+  <dialog id="newGameDialog"><form method="dialog" id="newGameForm" class="dialog-card"><div class="card-head"><div><div class="eyebrow">NEW GAME</div><h2>Create game</h2></div><button class="icon-btn" value="cancel" aria-label="Close">×</button></div><label>Opponent<input id="opponentInput" required autofocus></label><label>Date<input id="gameDateInput" type="date" required></label><label>Season<input id="gameSeasonInput"></label><label>League<input id="gameLeagueInput"></label><label>Team<input id="gameTeamInput"></label><div class="button-row"><button class="secondary" value="cancel" type="button" id="cancelNewGame">Cancel</button><button class="primary" type="submit">Start game</button></div></form></dialog>
+
+  <dialog id="summaryDialog"><div class="dialog-card wide"><div class="card-head"><div><div class="eyebrow">GAME SUMMARY</div><h2 id="summaryTitle"></h2></div><button id="closeSummary" class="icon-btn" aria-label="Close">×</button></div><div id="summaryBadges" class="badge-row"></div><div id="summaryStats" class="stat-grid six"></div><div id="summaryShooting" class="summary-block"></div><div id="summaryPeriods" class="table-wrap"></div><div id="summaryNotesWrap" class="summary-block hidden"><h3>Notes</h3><p id="summaryNotes"></p></div><div class="button-row"><button id="summaryShare" class="icon-action" type="button" title="Share" aria-label="Share">↗</button><button id="summaryResume" class="secondary" type="button">Resume</button><button id="summaryDone" class="primary" type="button">Done</button></div></div></dialog>
+
+  <dialog id="rewardDialog"><div class="reward-card"><div id="rewardIcon" class="reward-icon">🏆</div><div id="rewardEyebrow" class="eyebrow">ACHIEVEMENT</div><h2 id="rewardTitle"></h2><p id="rewardMessage"></p><button id="rewardClose" class="primary" type="button">Nice!</button></div></dialog>
+
+  <dialog id="compareDialog"><div class="dialog-card wide"><div class="card-head"><h2>Game comparison</h2><button id="closeCompare" class="icon-btn">×</button></div><div id="compareContent"></div></div></dialog>
+
+  <input id="hiddenRestore" type="file" class="hidden">
+  <script src="./app.js" defer></script>
+</body>
+</html>
