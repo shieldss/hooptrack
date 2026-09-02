@@ -16,7 +16,7 @@
     <header class="topbar">
       <div class="brand-wrap">
         <img src="./icons/icon-192.png" class="brand-icon" alt="">
-        <div><div class="brand">HoopTrack <span class="version">v2.0.5</span></div><div id="headerContext" class="muted small">One-player basketball tracker</div></div>
+        <div><div class="brand">HoopTrack <span class="version">v2.0.6</span></div><div id="headerContext" class="muted small">One-player basketball tracker</div></div>
       </div>
       <button id="quickThemeBtn" class="icon-btn" type="button" aria-label="Toggle theme" title="Toggle theme">◐</button>
     </header>
@@ -102,6 +102,20 @@
         <div id="historyList" class="game-list"></div>
       </section>
 
+      <section id="cardsView" class="view">
+        <div class="section-title"><div><div class="eyebrow">SOCIAL SHARE</div><h1>Cards</h1></div></div>
+        <section class="card settings-form">
+          <div class="final-score-grid">
+            <label>Card type<select id="cardTypeSelect"><option value="game">Game Card</option><option value="season">Season Card</option></select></label>
+            <label id="cardGameWrap">Game<select id="cardGameSelect"></select></label>
+            <label id="cardSeasonWrap">Season<select id="cardSeasonSelect"></select></label>
+            <label>Player photo<input id="cardPhotoInput" type="file" accept="image/*"></label>
+          </div>
+          <div class="button-row"><button id="generateCardBtn" class="primary" type="button">Generate card</button><button id="shareCardBtn" class="secondary" type="button" disabled>Share PNG</button><button id="downloadCardBtn" class="secondary" type="button" disabled>Download PNG</button></div>
+        </section>
+        <section class="card card-preview-card"><canvas id="cardCanvas" width="1080" height="1350" aria-label="Generated trading card preview"></canvas></section>
+      </section>
+
       <section id="settingsView" class="view">
         <div class="section-title"><div><div class="eyebrow">CONFIGURATION</div><h1>Settings</h1></div></div>
         <form id="profileForm" class="card settings-form">
@@ -122,6 +136,7 @@
       <button data-view="game" type="button">●<span>Game</span></button>
       <button data-view="season" type="button">▥<span>Season</span></button>
       <button data-view="history" type="button">☷<span>History</span></button>
+      <button data-view="cards" type="button">▣<span>Cards</span></button>
       <button data-view="settings" type="button">⚙<span>Settings</span></button>
     </nav>
   </div>
