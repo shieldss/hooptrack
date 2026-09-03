@@ -16,7 +16,7 @@
     <header class="topbar">
       <div class="brand-wrap">
         <img src="./icons/icon-192.png" class="brand-icon" alt="">
-        <div><div class="brand">HoopTrack <span class="version">v2.0.11</span></div><div id="headerContext" class="muted small">One-player basketball tracker</div></div>
+        <div><div class="brand">HoopTrack <span class="version">v2.0.22</span></div><div id="headerContext" class="muted small">One-player basketball tracker</div></div>
       </div>
       <button id="quickThemeBtn" class="icon-btn" type="button" aria-label="Toggle theme" title="Toggle theme">◐</button>
     </header>
@@ -24,6 +24,7 @@
     <main>
       <section id="homeView" class="view active">
         <div class="hero card">
+          <img id="homePlayerPhoto" class="player-avatar large" alt="Player profile photo">
           <div>
             <div class="eyebrow">PLAYER PROFILE</div>
             <h1 id="homePlayerName">Not set</h1>
@@ -44,6 +45,7 @@
 
       <section id="gameView" class="view">
         <div class="game-header card">
+          <img id="gamePlayerPhoto" class="player-avatar" alt="Player profile photo">
           <div><div id="gameMeta" class="eyebrow"></div><h1 id="gameOpponent">Game</h1><div id="gameSubmeta" class="muted"></div></div>
           <div class="live-score"><span>PTS</span><strong id="livePoints">0</strong></div>
         </div>
@@ -108,10 +110,9 @@
           <div class="final-score-grid">
             <label>Card type<select id="cardTypeSelect"><option value="game">Game Card</option><option value="season">Season Card</option></select></label>
             <label>Format<select id="cardFormatSelect"><option value="landscape">Landscape</option><option value="square">Square</option><option value="portrait">Portrait</option></select></label>
-            <label>Background color<input id="cardBackgroundInput" type="color" value="#18324f"></label>
             <label id="cardGameWrap">Game<select id="cardGameSelect"></select></label>
             <label id="cardSeasonWrap">Season<select id="cardSeasonSelect"></select></label>
-            <label>Player photo<input id="cardPhotoInput" type="file" accept="image/*"></label>
+            <label>Custom card photo<input id="cardPhotoInput" type="file" accept="image/*"></label>
           </div>
           <div class="button-row"><button id="generateCardBtn" class="primary" type="button">Generate card</button><button id="shareCardBtn" class="secondary" type="button" disabled>Share PNG</button><button id="downloadCardBtn" class="secondary" type="button" disabled>Download PNG</button></div>
         </section>
@@ -123,6 +124,9 @@
         <form id="profileForm" class="card settings-form">
           <h3>Defaults for new games</h3>
           <label>Player name<input id="settingsPlayer" required></label>
+          <label>Jersey number<input id="settingsJersey" type="number" min="0" max="99" inputmode="numeric" placeholder="14"></label>
+          <label class="secondary file-btn">Player photo<input id="settingsPhoto" type="file" accept="image/*"></label>
+          <img id="settingsPhotoPreview" class="profile-photo-preview hidden" alt="Player profile preview">
           <label>Season<input id="settingsSeason" placeholder="2026–27"></label>
           <label>League<input id="settingsLeague" placeholder="AAU, School, Summer…"></label>
           <label>Team<input id="settingsTeam" placeholder="Team name"></label>
@@ -152,6 +156,6 @@
   <dialog id="compareDialog"><div class="dialog-card wide"><div class="card-head"><h2>Game comparison</h2><button id="closeCompare" class="icon-btn">×</button></div><div id="compareContent"></div></div></dialog>
 
   <input id="hiddenRestore" type="file" class="hidden">
-  <script src="./app.js" defer></script>
+  <script src="./app.js?v=2.0.20" defer></script>
 </body>
 </html>
