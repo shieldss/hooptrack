@@ -16,7 +16,7 @@
     <header class="topbar">
       <div class="brand-wrap">
         <img src="./icons/icon-192.png" class="brand-icon" alt="">
-        <div><div class="brand">HoopTrack <span class="version">v2.0.22</span></div><div id="headerContext" class="muted small">One-player basketball tracker</div></div>
+        <div><div class="brand">HoopTrack <span class="version">v2.0.23</span></div><div id="headerContext" class="muted small">One-player basketball tracker</div></div>
       </div>
       <button id="quickThemeBtn" class="icon-btn" type="button" aria-label="Toggle theme" title="Toggle theme">◐</button>
     </header>
@@ -126,7 +126,7 @@
           <label>Player name<input id="settingsPlayer" required></label>
           <label>Jersey number<input id="settingsJersey" type="number" min="0" max="99" inputmode="numeric" placeholder="14"></label>
           <label class="secondary file-btn">Player photo<input id="settingsPhoto" type="file" accept="image/*"></label>
-          <img id="settingsPhotoPreview" class="profile-photo-preview hidden" alt="Player profile preview">
+          <div class="profile-photo-tools"><img id="settingsPhotoPreview" class="profile-photo-preview hidden" alt="Player profile preview"><button id="removeProfilePhotoBtn" class="secondary hidden" type="button">Remove photo</button></div>
           <label>Season<input id="settingsSeason" placeholder="2026–27"></label>
           <label>League<input id="settingsLeague" placeholder="AAU, School, Summer…"></label>
           <label>Team<input id="settingsTeam" placeholder="Team name"></label>
