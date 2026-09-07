@@ -1,6 +1,6 @@
 (() => {
     'use strict';
-    const VERSION = '2.0.28', STORAGE_KEY = 'hooptrack-v1';
+    const VERSION = '2.0.29', STORAGE_KEY = 'hooptrack-v1';
     // Adjust these values to reshape only the photo frame's top-left and bottom-right corners.
     const PHOTO_FRAME_CHAMFERS = { topLeft: 25, bottomRight: 44 };
     // Edit these values to control the score's font, size, weight, style, and decoration.
