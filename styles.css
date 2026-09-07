@@ -210,6 +210,29 @@ button,
     margin: 24px 0 12px
 }
 
+.season-record {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  gap: 1rem;
+  margin: 1rem 0;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--panel), var(--panel-2));
+}
+
+.season-record strong {
+  display: block;
+  margin-top: .15rem;
+  color: var(--ink);
+  font-size: clamp(3rem, 10vw, 5rem);
+  font-weight: 950;
+  line-height: 1;
+}
+
 .card .card-head {
     margin: 0 0 14px
 }
