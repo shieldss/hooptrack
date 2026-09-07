@@ -216,9 +216,9 @@ button,
   justify-content: center;
   flex-direction: column;
   text-align: center;
-  gap: 1rem;
-  margin: 1rem 0;
-  padding: 1rem 1.25rem;
+  gap: .4rem;
+  margin: 1.5rem 0 2rem;
+  padding: 1.25rem;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: linear-gradient(135deg, var(--panel), var(--panel-2));
@@ -231,6 +231,12 @@ button,
   font-size: clamp(3rem, 10vw, 5rem);
   font-weight: 950;
   line-height: 1;
+}
+
+.season-record .eyebrow {
+  color: var(--accent2);
+  font-size: 1rem;
+  font-weight: 850;
 }
 
 .card .card-head {
