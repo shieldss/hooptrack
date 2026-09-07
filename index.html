@@ -16,7 +16,7 @@
     <header class="topbar">
       <div class="brand-wrap">
         <img src="./icons/icon-192.png" class="brand-icon" alt="">
-        <div><div class="brand">HoopTrack <span class="version">v2.0.23</span></div><div id="headerContext" class="muted small">One-player basketball tracker</div></div>
+        <div><div class="brand">HoopTrack <span class="version">v2.0.26</span></div><div id="headerContext" class="muted small">One-player basketball tracker</div></div>
       </div>
       <button id="quickThemeBtn" class="icon-btn" type="button" aria-label="Toggle theme" title="Toggle theme">◐</button>
     </header>
@@ -112,7 +112,7 @@
             <label>Format<select id="cardFormatSelect"><option value="landscape">Landscape</option><option value="square">Square</option><option value="portrait">Portrait</option></select></label>
             <label id="cardGameWrap">Game<select id="cardGameSelect"></select></label>
             <label id="cardSeasonWrap">Season<select id="cardSeasonSelect"></select></label>
-            <label>Custom card photo<input id="cardPhotoInput" type="file" accept="image/*"></label>
+            <label>Custom card photo<input id="cardPhotoInput" type="file" accept="image/*"></label><button id="removeCardPhotoBtn" class="secondary hidden" type="button">Use profile photo</button>
           </div>
           <div class="button-row"><button id="generateCardBtn" class="primary" type="button">Generate card</button><button id="shareCardBtn" class="secondary" type="button" disabled>Share PNG</button><button id="downloadCardBtn" class="secondary" type="button" disabled>Download PNG</button></div>
         </section>
