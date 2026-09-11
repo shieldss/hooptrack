@@ -16,7 +16,7 @@
     <header class="topbar">
       <div class="brand-wrap">
         <img src="./icons/icon-192.png" class="brand-icon" alt="">
-        <div><div class="brand">HoopTrack <span class="version">v2.1.3</span></div><div id="headerContext" class="muted small">One-player basketball tracker</div></div>
+        <div><div class="brand">HoopTrack <span class="version">v2.1.4</span></div><div id="headerContext" class="muted small">One-player basketball tracker</div></div>
       </div>
       <button id="quickThemeBtn" class="icon-btn" type="button" aria-label="Toggle theme" title="Toggle theme">◐</button>
     </header>
@@ -115,7 +115,7 @@
             <label id="cardSeasonWrap">Season<select id="cardSeasonSelect"></select></label>
             <label>Custom card photo<input id="cardPhotoInput" type="file" accept="image/*"></label><button id="removeCardPhotoBtn" class="secondary hidden" type="button">Use profile photo</button>
           </div>
-          <div class="button-row"><button id="generateCardBtn" class="primary" type="button">Generate card</button><button id="shareCardBtn" class="secondary" type="button" disabled>Share PNG</button><button id="downloadCardBtn" class="secondary" type="button" disabled>Download PNG</button></div>
+          <div class="button-row"><button id="generateCardBtn" class="primary" type="button">Generate card</button><button id="copyCardPromptBtn" class="secondary" type="button">Copy Stats for AI</button><button id="shareCardBtn" class="secondary" type="button" disabled>Share PNG</button><button id="downloadCardBtn" class="secondary" type="button" disabled>Download PNG</button></div>
         </section>
         <section class="card card-preview-card"><canvas id="cardCanvas" width="1350" height="1080" aria-label="Generated trading card preview"></canvas></section>
       </section>
@@ -157,6 +157,6 @@
   <dialog id="compareDialog"><div class="dialog-card wide"><div class="card-head"><h2>Game comparison</h2><button id="closeCompare" class="icon-btn">×</button></div><div id="compareContent"></div></div></dialog>
 
   <input id="hiddenRestore" type="file" class="hidden">
-  <script src="./app.js?v=2.0.20" defer></script>
+  <script src="./app.js?v=2.1.4" defer></script>
 </body>
 </html>
