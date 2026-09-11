@@ -1,14 +1,14 @@
 (() => {
     'use strict';
-    const VERSION = '2.1.4', STORAGE_KEY = 'hooptrack-v1';
+    const VERSION = '2.2.0', STORAGE_KEY = 'hooptrack-v1';
     // Adjust these values to reshape only the photo frame's top-left and bottom-right corners.
     const PHOTO_FRAME_CHAMFERS = { topLeft: 25, bottomRight: 44 };
     // Edit these values to control the score's font, size, weight, style, and decoration.
     const CARD_SCORE_STYLE = { fontFamily: 'Impact, Haettenschweiler, Arial Narrow, sans-serif', fontSize: 80, fontWeight: '800', fontStyle: 'italic', textDecoration: 'none', letterSpacing: -1 };
     const basePeriod = () => ({ ftMade: 0, ftMiss: 0, twoMade: 0, twoMiss: 0, threeMade: 0, threeMiss: 0, assists: 0, rebounds: 0, steals: 0, blocks: 0, turnovers: 0, fouls: 0 });
-    const initial = { games: [], activeGameId: null, playerName: '', jerseyNumber: '', playerPhoto: '', seasonName: '', leagueName: '', teamName: '', settings: { theme: 'system', haptics: true, wakeLock: true, playTime: false }, filters: { dashboardSeason: '', dashboardLeague: '', season: '', seasonLeague: '', historySeason: '', historyLeague: '', historySort: 'newest', favoritesOnly: false, historySearch: '' } };
+    const initial = { games: [], activeGameId: null, playerName: '', jerseyNumber: '', playerPhoto: '', seasonName: '', leagueName: '', teamName: '', settings: { theme: 'system', haptics: true, wakeLock: true, playTime: false, graphicTemplate: 'bold', graphicColors: null }, filters: { dashboardSeason: '', dashboardLeague: '', season: '', seasonLeague: '', historySeason: '', historyLeague: '', historySort: 'newest', favoritesOnly: false, historySearch: '' } };
     const clone = o => JSON.parse(JSON.stringify(o));
-    let state = loadState(), wakeLock = null, timerHandle = null, currentView = 'home', cardPhoto = null, cardBlob = null, profilePhotoImage = null;
+    let state = loadState(), wakeLock = null, timerHandle = null, currentView = 'home', cardPhoto = null, cardBlob = null, profilePhotoImage = null, graphicGame = null, graphicPhoto = null, graphicOriginalPhoto = null;
     const cardLogo = new Image(); cardLogo.src = './icons/icon-512.png'; const cardBackgroundImage = new Image(); cardBackgroundImage.src = './images/bg.png';
     const $ = id => document.getElementById(id), $$ = sel => [...document.querySelectorAll(sel)];
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -45,7 +45,7 @@
     function renderAll() { renderHeader(); renderHome(); renderGame(); renderSeason(); renderHistory(); renderCardBuilder(); renderSettings() }
     function renderHeader() { $('headerContext').textContent = state.playerName ? `${state.playerName}${state.jerseyNumber ? ` • #${state.jerseyNumber}` : ''} • ${state.seasonName || 'No season'}` : 'One-player basketball tracker' }
     function renderHome() { $('homePlayerName').textContent = state.playerName || 'Set player in Settings'; $('homeSeasonName').textContent = state.seasonName || 'No season'; $('homeLeagueName').textContent = state.leagueName || 'No league'; $('homeTeamName').textContent = state.teamName || 'No team'; setImage($('homePlayerPhoto'), state.playerPhoto); const seasons = unique('seasonName'), leagues = unique('leagueName'); fillSelect($('dashboardSeasonFilter'), seasons, state.filters.dashboardSeason, 'All seasons'); fillSelect($('dashboardLeagueFilter'), leagues, state.filters.dashboardLeague, 'All leagues'); const gs = scopedGames(state.filters.dashboardSeason, state.filters.dashboardLeague), a = agg(gs); $('scopeLabel').textContent = [state.filters.dashboardSeason, state.filters.dashboardLeague].filter(Boolean).join(' • ') || 'All games'; $('overviewStats').innerHTML = statCard('Games', a.games.length) + statCard('PPG', f1(a.avg('points'))) + statCard('RPG', f1(a.avg('rebounds'))) + statCard('APG', f1(a.avg('assists'))) + statCard('SPG', f1(a.avg('steals'))) + statCard('BPG', f1(a.avg('blocks'))); const metrics = [['Points', 'points'], ['Rebounds', 'rebounds'], ['Assists', 'assists'], ['Steals', 'steals'], ['Blocks', 'blocks']]; $('seasonHighs').innerHTML = metrics.map(([l, k]) => { let best = null, val = -1; for (const g of a.games) { const n = totals(g)[k]; if (n > val) { val = n; best = g } } return `<div class="high-item"><span>${l}</span><b>${val < 0 ? 0 : val}</b></div>` }).join(''); const last = a.games.slice().sort((x, y) => (y.date || '').localeCompare(x.date || '')).slice(0, 5), la = agg(last); $('lastFiveStats').innerHTML = statCard('PPG', f1(la.avg('points'))) + statCard('RPG', f1(la.avg('rebounds'))) + statCard('APG', f1(la.avg('assists'))) + statCard('SPG', f1(la.avg('steals'))) + statCard('BPG', f1(la.avg('blocks'))); $('recentGames').innerHTML = last.slice(0, 3).map(gameCard).join('') || '<div class="empty">No completed games yet.</div>'; drawTrend(last.slice().reverse(), $('trendMetric').value) }
-    function gameCard(g, history = false) { const t = totals(g), score = finalScoreText(g), result = resultText(g); return `<article class="game-card" data-game-card="${g.id}"><div class="game-card-top"><div>${history ? `<label class="check"><input type="checkbox" data-compare="${g.id}"> Compare</label>` : ''}<div class="eyebrow">${g.endedAt ? 'FINAL' : 'IN PROGRESS'} ${g.favorite ? '<span class="favorite-star">★</span>' : ''}</div><h3>vs ${esc(g.opponent)}</h3><div class="muted small">${fmtDate(g.date)} • ${esc(g.seasonName)} • ${esc(g.leagueName)} • ${esc(g.teamName)}</div>${score ? `<div class="score-result">${esc(score)}</div>` : ''}<div class="badge-row">${achievementBadges(g)}</div></div><div class="score"><div>${t.points}</div><span class="muted small">PTS</span></div></div><div class="meta-row">${result ? `<span class="pill">${result}</span>` : ''}<span class="pill">${t.rebounds} REB</span><span class="pill">${t.assists} AST</span><span class="pill">${t.steals} STL</span><span class="pill">${t.blocks} BLK</span><span class="pill">${fp(t.fgPct)} FG</span></div><div class="game-actions"><button class="icon-action" data-view-game="${g.id}" title="View" aria-label="View">◉</button><button class="icon-action" data-share-game="${g.id}" title="Share" aria-label="Share">↗</button><button class="icon-action" data-favorite-game="${g.id}" title="Favorite" aria-label="Favorite">${g.favorite ? '★' : '☆'}</button><button class="icon-action" data-delete-game="${g.id}" title="Delete" aria-label="Delete">⌫</button></div></article>` }
+    function gameCard(g, history = false) { const t = totals(g), score = finalScoreText(g), result = resultText(g); return `<article class="game-card" data-game-card="${g.id}"><div class="game-card-top"><div>${history ? `<label class="check"><input type="checkbox" data-compare="${g.id}"> Compare</label>` : ''}<div class="eyebrow">${g.endedAt ? 'FINAL' : 'IN PROGRESS'} ${g.favorite ? '<span class="favorite-star">★</span>' : ''}</div><h3>vs ${esc(g.opponent)}</h3><div class="muted small">${fmtDate(g.date)} • ${esc(g.seasonName)} • ${esc(g.leagueName)} • ${esc(g.teamName)}</div>${score ? `<div class="score-result">${esc(score)}</div>` : ''}<div class="badge-row">${achievementBadges(g)}</div></div><div class="score"><div>${t.points}</div><span class="muted small">PTS</span></div></div><div class="meta-row">${result ? `<span class="pill">${result}</span>` : ''}<span class="pill">${t.rebounds} REB</span><span class="pill">${t.assists} AST</span><span class="pill">${t.steals} STL</span><span class="pill">${t.blocks} BLK</span><span class="pill">${fp(t.fgPct)} FG</span></div><div class="game-actions"><button class="icon-action" data-view-game="${g.id}" title="View" aria-label="View">◉</button>${g.endedAt ? `<button class="secondary graphic-action" data-create-graphic="${g.id}" type="button" title="Create Graphic">✦ Create Graphic</button>` : ''}<button class="icon-action" data-share-game="${g.id}" title="Share" aria-label="Share">↗</button><button class="icon-action" data-favorite-game="${g.id}" title="Favorite" aria-label="Favorite">${g.favorite ? '★' : '☆'}</button><button class="icon-action" data-delete-game="${g.id}" title="Delete" aria-label="Delete">⌫</button></div></article>` }
     function drawTrend(games, metric) { const c = $('trendCanvas'), ctx = c.getContext('2d'), dpr = devicePixelRatio || 1, w = c.clientWidth || 700, h = Math.min(320, Math.max(220, w * .42)); c.width = w * dpr; c.height = h * dpr; ctx.scale(dpr, dpr); ctx.clearRect(0, 0, w, h); const style = getComputedStyle(document.documentElement), border = style.getPropertyValue('--border'), muted = style.getPropertyValue('--muted'), accent = style.getPropertyValue('--accent2'); ctx.strokeStyle = border; ctx.fillStyle = muted; ctx.font = '12px system-ui'; for (let i = 0; i < 4; i++) { const y = 24 + i * (h - 60) / 3; ctx.beginPath(); ctx.moveTo(36, y); ctx.lineTo(w - 12, y); ctx.stroke() } if (!games.length) { ctx.fillText('No games to chart', 40, h / 2); return } const vals = games.map(g => metric === 'fgPct' ? totals(g).fgPct : totals(g)[metric]), max = Math.max(1, ...vals); ctx.strokeStyle = accent; ctx.lineWidth = 3; ctx.beginPath(); vals.forEach((v, i) => { const x = 40 + (w - 60) * (vals.length === 1 ? .5 : i / (vals.length - 1)), y = 24 + (h - 60) * (1 - v / max); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); ctx.fillStyle = accent; ctx.fillRect(x - 3, y - 3, 6, 6); ctx.fillStyle = muted; ctx.fillText(games[i].opponent.slice(0, 8), Math.max(2, x - 20), h - 12) }); ctx.stroke() }
     function periodOrder(g) { const keys = Object.keys(g.periods); return keys.sort((a, b) => { const n = x => x.startsWith('Q') ? +x.slice(1) : 4 + (+x.slice(2) || 1); return n(a) - n(b) }) }
     function ensurePeriod(g, p) { g.periods[p] ??= basePeriod() }
@@ -69,6 +69,96 @@
     function showSummary(g) { const t = totals(g), score = finalScoreText(g); $('summaryTitle').textContent = `vs ${g.opponent}`; $('summaryBadges').innerHTML = achievementBadges(g); $('summaryFinalScore').classList.toggle('hidden', !score); $('summaryFinalScore').innerHTML = score ? `<h3>Final score</h3><p class="score-result">${esc(score)}${resultText(g) ? ` • ${resultText(g)}` : ''}</p>` : ''; $('summaryStats').innerHTML = statCard('PTS', t.points) + statCard('REB', t.rebounds) + statCard('AST', t.assists) + statCard('STL', t.steals) + statCard('BLK', t.blocks) + statCard('MIN', f1(t.minutes)); $('summaryShooting').innerHTML = `<h3>Shooting</h3>${shootingCards(t)}`; $('summaryPeriods').innerHTML = `<table><thead><tr><th>Period</th><th>PTS</th><th>REB</th><th>AST</th><th>STL</th><th>BLK</th></tr></thead><tbody>${periodOrder(g).map(k => { const p = g.periods[k]; return `<tr><td>${k}</td><td>${periodPoints(p)}</td><td>${p.rebounds}</td><td>${p.assists}</td><td>${p.steals}</td><td>${p.blocks}</td></tr>` }).join('')}</tbody></table>`; $('summaryNotesWrap').classList.toggle('hidden', !g.notes.trim()); $('summaryNotes').textContent = g.notes; $('summaryResume').classList.toggle('hidden', !g.endedAt); $('summaryDialog').showModal() }
     function shareText(g) { const t = totals(g), score = finalScoreText(g); return `HoopTrack — ${g.playerName}\nvs ${g.opponent} • ${fmtDate(g.date)}\n${g.seasonName} • ${g.leagueName} • ${g.teamName}${score ? `\nFinal: ${score}${resultText(g) ? ` • ${resultText(g)}` : ''}` : ''}\n\nPTS ${t.points} | REB ${t.rebounds} | AST ${t.assists} | STL ${t.steals} | BLK ${t.blocks} | TO ${t.turnovers} | PF ${t.fouls}\nFG ${t.fgMade}/${t.fgAtt} (${fp(t.fgPct)}) | 3PT ${t.threeMade}/${t.threeAtt} (${fp(t.threePct)}) | FT ${t.ftMade}/${t.ftAtt} (${fp(t.ftPct)})\n${achievementList(g).map(x => x[0]).join(' • ')}${g.notes ? `\n\nNotes:\n${g.notes}` : ''}` }
     async function shareGame(g) { const text = shareText(g); try { if (navigator.share) await navigator.share({ title: `HoopTrack vs ${g.opponent}`, text }); else { await navigator.clipboard.writeText(text); alert('Game summary copied.') } } catch { } }
+    function loadImageSource(src) { return new Promise((resolve, reject) => { if (!src) return resolve(null); const img = new Image(); img.onload = () => resolve(img); img.onerror = reject; img.src = src }) }
+    function graphicDefaults() { return { primary: '#153a70', secondary: '#0b1f3a', accent: '#ff7a1a' } }
+    function colorDistance(a, b) { return Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]) }
+    function photoColors(image) {
+        if (!image?.naturalWidth) return graphicDefaults();
+        const c = document.createElement('canvas'), ctx = c.getContext('2d', { willReadFrequently: true });
+        c.width = c.height = 72;
+        ctx.drawImage(image, 0, 0, c.width, c.height);
+        const buckets = new Map();
+        for (let i = 0, px = ctx.getImageData(0, 0, c.width, c.height).data; i < px.length; i += 4) {
+            const [r, g, b] = [px[i], px[i + 1], px[i + 2]], max = Math.max(r, g, b), min = Math.min(r, g, b), saturation = max - min, lightness = (max + min) / 510;
+            if (saturation < 28 || lightness < .08 || lightness > .92) continue;
+            const key = [r >> 4, g >> 4, b >> 4].join(',');
+            buckets.set(key, (buckets.get(key) || 0) + saturation * (1 - Math.abs(lightness - .52)));
+        }
+        const colors = [...buckets.entries()].sort((a, b) => b[1] - a[1]).map(([key]) => key.split(',').map(x => +x * 16 + 8));
+        const pick = (fallback, previous = []) => colors.find(color => previous.every(prior => colorDistance(color, prior) > 75)) || fallback;
+        const primary = pick([21, 58, 112]), secondary = pick([11, 31, 58], [primary]), accent = pick([255, 122, 26], [primary, secondary]);
+        const hex = color => '#' + color.map(value => value.toString(16).padStart(2, '0')).join('');
+        return { primary: hex(primary), secondary: hex(secondary), accent: hex(accent) };
+    }
+    function setGraphicColors(colors, persist = false) { const next = { ...graphicDefaults(), ...colors }; $('graphicPrimaryColor').value = next.primary; $('graphicSecondaryColor').value = next.secondary; $('graphicAccentColor').value = next.accent; if (persist) { state.settings.graphicColors = next; save() } }
+    function graphicColors() { return { primary: $('graphicPrimaryColor').value, secondary: $('graphicSecondaryColor').value, accent: $('graphicAccentColor').value } }
+    function graphicData(g) {
+        const t = totals(g), score = hasFinalScore(g) ? `${g.teamScore} - ${g.opponentScore}` : '';
+        return {
+            player: g.playerName || state.playerName || 'Player', jersey: g.jerseyNumber || state.jerseyNumber || '', team: g.teamName || state.teamName || 'Team', opponent: g.opponent || 'Opponent', date: fmtDate(g.date), league: g.leagueName || state.leagueName || '', season: g.seasonName || state.seasonName || '',
+            points: t.points, finalScore: score, result: resultText(g).toUpperCase(), notes: g.notes || '', achievements: achievementList(g).map(item => item[0]),
+            stats: [['REB', t.rebounds], ['AST', t.assists], ['STL', t.steals], ['BLK', t.blocks], ['TO', t.turnovers], ['PF', t.fouls]].filter(([, value]) => value !== '' && value != null), logo: cardLogo
+        };
+    }
+    function renderGraphic() {
+        if (!graphicGame || !window.HoopTrackGraphicRenderer) return;
+        window.HoopTrackGraphicRenderer.render($('graphicCanvas'), graphicData(graphicGame), { template: $('graphicTemplateSelect').value, colors: graphicColors(), photo: graphicPhoto, photoTransform: { x: +$('graphicPhotoX').value, y: +$('graphicPhotoY').value, scale: +$('graphicPhotoScale').value } });
+    }
+    async function useGraphicPhoto(source) {
+        try {
+            const image = typeof source === 'string' ? await loadImageSource(source) : await loadImage(source);
+            if (!image) return;
+            graphicOriginalPhoto = image;
+            graphicPhoto = image;
+            setGraphicColors(photoColors(image), true);
+            $('graphicStatus').textContent = 'Theme colors matched to photo.';
+            renderGraphic();
+        } catch { $('graphicStatus').textContent = 'Could not read that photo. Try a different image.'; }
+    }
+    async function openGraphic(g) {
+        if (!g?.endedAt) return;
+        graphicGame = g;
+        $('graphicTitle').textContent = `vs ${g.opponent}`;
+        $('graphicTemplateSelect').value = state.settings.graphicTemplate || 'bold';
+        setGraphicColors(state.settings.graphicColors || graphicDefaults());
+        $('graphicPhotoX').value = 0; $('graphicPhotoY').value = 0; $('graphicPhotoScale').value = 1;
+        $('graphicStatus').textContent = '';
+        graphicPhoto = null;
+        graphicOriginalPhoto = null;
+        $('graphicPhotoInput').value = '';
+        const profile = g.playerPhoto || state.playerPhoto;
+        if (profile) await useGraphicPhoto(profile); else renderGraphic();
+        if (!$('graphicDialog').open) $('graphicDialog').showModal();
+    }
+    function resetGraphicPhoto() { $('graphicPhotoX').value = 0; $('graphicPhotoY').value = 0; $('graphicPhotoScale').value = 1; renderGraphic() }
+    async function removeGraphicBackground() {
+        if (!graphicPhoto?.naturalWidth) { $('graphicStatus').textContent = 'Add a player photo before removing its background.'; return; }
+        $('graphicStatus').textContent = 'Removing background locally…';
+        await new Promise(resolve => setTimeout(resolve, 20));
+        try {
+            const max = 1200, ratio = Math.min(1, max / Math.max(graphicPhoto.naturalWidth, graphicPhoto.naturalHeight)), w = Math.max(1, Math.round(graphicPhoto.naturalWidth * ratio)), h = Math.max(1, Math.round(graphicPhoto.naturalHeight * ratio));
+            const c = document.createElement('canvas'), ctx = c.getContext('2d', { willReadFrequently: true });
+            c.width = w; c.height = h; ctx.drawImage(graphicPhoto, 0, 0, w, h);
+            const imageData = ctx.getImageData(0, 0, w, h), pixels = imageData.data, samples = [];
+            for (const [x, y] of [[0, 0], [w - 1, 0], [0, h - 1], [w - 1, h - 1]]) for (let dy = 0; dy < 18; dy++) for (let dx = 0; dx < 18; dx++) { const px = Math.min(w - 1, Math.max(0, x + (x ? -dx : dx))), py = Math.min(h - 1, Math.max(0, y + (y ? -dy : dy))), i = (py * w + px) * 4; samples.push([pixels[i], pixels[i + 1], pixels[i + 2]]); }
+            const background = samples.reduce((sum, sample) => sum.map((v, i) => v + sample[i]), [0, 0, 0]).map(v => v / samples.length);
+            for (let i = 0; i < pixels.length; i += 4) { const distance = Math.hypot(pixels[i] - background[0], pixels[i + 1] - background[1], pixels[i + 2] - background[2]); if (distance < 35) pixels[i + 3] = 0; else if (distance < 70) pixels[i + 3] = Math.round((distance - 35) / 35 * 255); }
+            ctx.putImageData(imageData, 0, 0);
+            const blob = await new Promise(resolve => c.toBlob(resolve, 'image/png'));
+            if (!blob) throw new Error('No image output');
+            graphicPhoto = await loadImageSource(URL.createObjectURL(blob));
+            $('graphicStatus').textContent = 'Background cleaned locally. You can reset by choosing the photo again.';
+            renderGraphic();
+        } catch { $('graphicStatus').textContent = 'Background cleanup was unavailable. The original photo is still usable.'; graphicPhoto = graphicOriginalPhoto; renderGraphic(); }
+    }
+    function graphicFilename() { const slug = value => String(value || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''); return `hooptrack-${slug(graphicGame?.playerName || state.playerName)}-vs-${slug(graphicGame?.opponent)}-${graphicGame?.date || 'graphic'}.png` }
+    async function saveGraphic() { const blob = await new Promise(resolve => $('graphicCanvas').toBlob(resolve, 'image/png')); if (blob) download(graphicFilename(), blob, 'image/png') }
+    async function shareGraphic() {
+        const blob = await new Promise(resolve => $('graphicCanvas').toBlob(resolve, 'image/png'));
+        if (!blob || !graphicGame) return;
+        const t = totals(graphicGame), file = new File([blob], graphicFilename(), { type: 'image/png' }), text = `${graphicGame.playerName} vs ${graphicGame.opponent}\n${t.points} PTS${t.rebounds ? ` • ${t.rebounds} REB` : ''}${t.assists ? ` • ${t.assists} AST` : ''}`;
+        try { if (navigator.canShare?.({ files: [file] }) && navigator.share) await navigator.share({ title: 'HoopTrack Game Performance', text, files: [file] }); else await saveGraphic() } catch { }
+    }
     function backup() { download(`hooptrack-backup-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify({ ...state, exportedAt: new Date().toISOString(), appVersion: VERSION }, null, 2), 'application/json') }
     function csv() { const rows = [['Date', 'Player', 'Season', 'League', 'Team', 'Opponent', 'Team Score', 'Opponent Score', 'Result', 'PTS', 'REB', 'AST', 'STL', 'BLK', 'TO', 'PF', 'FGM', 'FGA', 'FG%', '3PM', '3PA', '3P%', 'FTM', 'FTA', 'FT%', 'Minutes', 'Favorite', 'Notes']]; for (const g of completed(state.games)) { const t = totals(g); rows.push([g.date, g.playerName, g.seasonName, g.leagueName, g.teamName, g.opponent, g.teamScore, g.opponentScore, resultText(g), t.points, t.rebounds, t.assists, t.steals, t.blocks, t.turnovers, t.fouls, t.fgMade, t.fgAtt, f1(t.fgPct), t.threeMade, t.threeAtt, f1(t.threePct), t.ftMade, t.ftAtt, f1(t.ftPct), f1(t.minutes), g.favorite ? 'Yes' : 'No', g.notes]) } download('hooptrack-games.csv', rows.map(r => r.map(v => '"' + String(v ?? '').replace(/"/g, '""') + '"').join(',')).join('\n'), 'text/csv') }
     function download(name, data, type) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([data], { type })); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000) }
@@ -148,6 +238,8 @@
     async function shareCard() { if (!cardBlob) return; const file = new File([cardBlob], `hooptrack-card-${Date.now()}.png`, { type: 'image/png' }); try { if (navigator.canShare?.({ files: [file] }) && navigator.share) await navigator.share({ files: [file], title: 'HoopTrack card' }); else downloadCard() } catch { } }
     function bind() {
         $$('.bottom-nav button').forEach(b => b.addEventListener('click', () => setView(b.dataset.view))); $('goHistoryBtn').onclick = () => setView('history'); $('newGameBtn').onclick = () => { if (!state.playerName) { setView('settings'); $('settingsPlayer').focus(); return } $('opponentInput').value = ''; $('gameDateInput').value = new Date().toISOString().slice(0, 10); $('gameSeasonInput').value = state.seasonName; $('gameLeagueInput').value = state.leagueName; $('gameTeamInput').value = state.teamName; $('newGameDialog').showModal() }; $('cancelNewGame').onclick = () => $('newGameDialog').close(); $('newGameForm').addEventListener('submit', e => { e.preventDefault(); startGame() });
+        document.addEventListener('click', e => { const button = e.target.closest('[data-create-graphic]'); if (button) openGraphic(state.games.find(game => game.id === button.dataset.createGraphic)); });
+        $('closeGraphicBtn').onclick = () => $('graphicDialog').close(); $('closeGraphicFooterBtn').onclick = () => $('graphicDialog').close(); $('graphicTemplateSelect').onchange = e => { state.settings.graphicTemplate = e.target.value; save(); renderGraphic() }; ['graphicPrimaryColor', 'graphicSecondaryColor', 'graphicAccentColor'].forEach(id => $(id).oninput = () => { state.settings.graphicColors = graphicColors(); save(); renderGraphic() }); $('resetGraphicColorsBtn').onclick = () => { setGraphicColors(photoColors(graphicOriginalPhoto || graphicPhoto), true); renderGraphic() }; $('graphicPhotoInput').onchange = e => e.target.files[0] && useGraphicPhoto(e.target.files[0]); $('graphicRemoveBgBtn').onclick = removeGraphicBackground; ['graphicPhotoX', 'graphicPhotoY', 'graphicPhotoScale'].forEach(id => $(id).oninput = renderGraphic); $('resetGraphicPhotoBtn').onclick = resetGraphicPhoto; $('saveGraphicBtn').onclick = saveGraphic; $('shareGraphicBtn').onclick = shareGraphic;
         $('gameView').addEventListener('click', e => { const s = e.target.closest('[data-stat]'); if (s) logStat(s.dataset.stat); const p = e.target.closest('[data-period]'); if (p) { const g = activeGame(); if (g && !g.endedAt) { g.activePeriod = p.dataset.period; save(); renderGame() } } const de = e.target.closest('[data-delete-event]'); if (de) deleteEvent(de.dataset.deleteEvent); if (e.target.id === 'addOTBtn') { const g = activeGame(), n = periodOrder(g).filter(x => x.startsWith('OT')).length + 1, pk = 'OT' + n; ensurePeriod(g, pk); g.activePeriod = pk; save(); renderGame() } });
         $('teamScoreInput').addEventListener('input', () => { $('finalScoreSaved').textContent = 'Unsaved' }); $('opponentScoreInput').addEventListener('input', () => { $('finalScoreSaved').textContent = 'Unsaved' }); $('saveFinalScoreBtn').onclick = saveFinalScore; $('gameNotes').addEventListener('input', e => { const g = activeGame(); if (g && !g.endedAt) { g.notes = e.target.value; save(); $('notesSaved').textContent = 'Saved' } }); $('undoBtn').onclick = () => { const g = activeGame(); if (g?.events.length) deleteEvent(g.events.at(-1).id) }; $('togglePlayBtn').onclick = togglePlaying; $('endGameBtn').onclick = endGame; $('resumeGameBtn').onclick = () => { const g = activeGame(); if (g) { g.endedAt = null; save(); renderGame(); requestWake() } }; $('favoriteBtn').onclick = () => { const g = activeGame(); if (g) { g.favorite = !g.favorite; save(); renderGame() } };
         $('summaryDone').onclick = () => { $('summaryDialog').close(); setView('home') }; $('closeSummary').onclick = () => $('summaryDialog').close(); $('summaryResume').onclick = () => { const g = activeGame(); if (g) { g.endedAt = null; save(); $('summaryDialog').close(); renderGame(); requestWake() } }; $('summaryShare').onclick = () => { const g = activeGame(); if (g) shareGame(g) }; $('rewardClose').onclick = () => $('rewardDialog').close(); $('closeCompare').onclick = () => $('compareDialog').close();

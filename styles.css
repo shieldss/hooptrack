@@ -420,6 +420,7 @@ textarea {
 .game-actions {
     display: flex;
     justify-content: flex-end;
+    flex-wrap: wrap;
     gap: 8px;
     margin-top: 10px
 }
@@ -956,3 +957,7 @@ dialog::backdrop {
     background: var(--panel2);
     cursor: pointer
 }
+
+.graphic-action{min-height:36px;padding:7px 10px;font-size:.78rem;color:var(--accent2)}
+#graphicDialog{max-width:1120px;max-height:100vh;overflow:auto}.graphic-dialog{max-width:1080px;margin:auto}.graphic-preview{background:#07111f;border:1px solid var(--border);border-radius:12px;overflow:hidden;display:grid;place-items:center}.graphic-preview canvas{display:block;width:min(100%,680px);height:auto;background:#07111f}.graphic-controls,.graphic-color-controls,.graphic-photo-controls{display:flex;align-items:end;gap:10px;flex-wrap:wrap}.graphic-controls label,.graphic-color-controls label,.graphic-photo-controls label{display:grid;gap:6px;color:var(--muted);font-size:.78rem;font-weight:750}.graphic-controls select{min-width:150px}.graphic-color-controls,.graphic-photo-controls{padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--panel2)}.graphic-color-controls .eyebrow,.graphic-photo-controls .eyebrow{width:100%}.graphic-color-controls input[type=color]{width:72px;height:38px;padding:3px;border-radius:8px;border:1px solid var(--border);background:transparent}.graphic-photo-controls label{flex:1 1 160px}.graphic-photo-controls input[type=range]{accent-color:var(--accent2);width:100%}
+@media(max-width:760px){#graphicDialog{padding:6px}.graphic-dialog{padding:14px}.graphic-controls,.graphic-color-controls,.graphic-photo-controls{align-items:stretch}.graphic-controls>*,.graphic-color-controls>*,.graphic-photo-controls>*{flex:1 1 130px}.graphic-color-controls .eyebrow,.graphic-photo-controls .eyebrow{flex-basis:100%}}
