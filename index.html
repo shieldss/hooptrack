@@ -16,7 +16,7 @@
     <header class="topbar">
       <div class="brand-wrap">
         <img src="./icons/icon-192.png" class="brand-icon" alt="">
-        <div><div class="brand">HoopTrack <span class="version">v2.3.2</span></div><div id="headerContext" class="muted small">One-player basketball tracker</div></div>
+        <div><div class="brand">HoopTrack <span class="version">v2.3.3</span></div><div id="headerContext" class="muted small">One-player basketball tracker</div></div>
       </div>
       <div class="topbar-actions"><span id="cloudStatus" class="cloud-status" data-state="offline" aria-live="polite">☁ Offline</span><button id="quickThemeBtn" class="icon-btn" type="button" aria-label="Toggle theme" title="Toggle theme">◐</button></div>
     </header>
@@ -176,8 +176,20 @@
   <dialog id="migrationDialog" aria-label="Import existing HoopTrack data"><div class="dialog-card"><div class="eyebrow">HOOPTRACK CLOUD</div><h2>Bring this device's stats with you?</h2><p id="migrationCounts" class="muted"></p><p class="muted small">Import keeps this local copy and securely adds its player, league, and game data to your Google account. Player photos and generated graphics stay on this device.</p><div class="button-row"><button id="migrationImportBtn" class="primary" type="button">Import my data</button><button id="migrationFreshBtn" class="secondary" type="button">Start fresh</button></div></div></dialog>
 
   <input id="hiddenRestore" type="file" class="hidden">
-  <script src="./graphic-renderer.js?v=2.3.2" defer></script>
-  <script src="./app.js?v=2.3.2" defer></script>
-  <script type="module" src="./cloud-sync.js?v=2.3.2"></script>
+  <script>
+    // The primary tabs must remain usable even if an optional module is delayed or fails.
+    document.addEventListener('click', function (event) {
+      const button = event.target.closest('.bottom-nav button[data-view]');
+      if (!button) return;
+      const view = button.dataset.view;
+      const panel = document.getElementById(view + 'View');
+      if (!panel) return;
+      document.querySelectorAll('.view').forEach(function (item) { item.classList.toggle('active', item === panel); });
+      document.querySelectorAll('.bottom-nav button[data-view]').forEach(function (item) { item.classList.toggle('active', item === button); });
+    });
+  </script>
+  <script src="./graphic-renderer.js?v=2.3.3" defer></script>
+  <script src="./app.js?v=2.3.3" defer></script>
+  <script type="module" src="./cloud-sync.js?v=2.3.3"></script>
 </body>
 </html>
