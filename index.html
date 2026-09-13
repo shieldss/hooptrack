@@ -16,9 +16,9 @@
     <header class="topbar">
       <div class="brand-wrap">
         <img src="./icons/icon-192.png" class="brand-icon" alt="">
-        <div><div class="brand">HoopTrack <span class="version">v2.2.0</span></div><div id="headerContext" class="muted small">One-player basketball tracker</div></div>
+        <div><div class="brand">HoopTrack <span class="version">v2.3.0</span></div><div id="headerContext" class="muted small">One-player basketball tracker</div></div>
       </div>
-      <button id="quickThemeBtn" class="icon-btn" type="button" aria-label="Toggle theme" title="Toggle theme">◐</button>
+      <div class="topbar-actions"><span id="cloudStatus" class="cloud-status" data-state="offline" aria-live="polite">☁ Offline</span><button id="quickThemeBtn" class="icon-btn" type="button" aria-label="Toggle theme" title="Toggle theme">◐</button></div>
     </header>
 
     <main>
@@ -134,6 +134,7 @@
           <button class="primary" type="submit">Save profile</button>
         </form>
         <section class="card settings-form"><h3>Appearance & game behavior</h3><label>Theme<select id="themeSelect"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label><label class="switch-row"><span>Haptic feedback</span><input id="hapticsToggle" type="checkbox"></label><label class="switch-row"><span>Keep screen awake during games</span><input id="wakeLockToggle" type="checkbox"></label><label class="switch-row"><span>Track playing time</span><input id="playTimeToggle" type="checkbox"></label></section>
+        <section class="card settings-form cloud-account"><div class="card-head"><div><div class="eyebrow">CLOUD SYNC</div><h3>HoopTrack Cloud</h3></div><span id="cloudStatusDetail" class="muted small">Changes are saved on this device.</span></div><div id="cloudSignedOut"><p class="muted">Sign in with Google to securely back up your stats and access them across devices.</p><button id="cloudSignInBtn" class="secondary google-signin" type="button"><span aria-hidden="true">G</span> Sign in with Google</button><p class="muted small">Offline mode stays available without an account.</p></div><div id="cloudSignedIn" class="cloud-profile hidden"><img id="cloudAccountPhoto" class="cloud-avatar" alt="Google account profile photo"><div><strong id="cloudAccountName"></strong><div id="cloudAccountEmail" class="muted small"></div></div><button id="cloudSignOutBtn" class="text-btn" type="button">Sign out</button></div></section>
         <section class="card settings-form"><h3>Data</h3><div class="button-row"><button id="backupBtn" class="secondary" type="button">Backup JSON</button><label class="secondary file-btn">Restore JSON<input id="restoreInput" type="file" accept="application/json,.json"></label><button id="csvBtn" class="secondary" type="button">Export CSV</button></div><p class="muted small">Backups include player profile, seasons, leagues, teams, games, notes, achievements, and settings.</p></section>
       </section>
     </main>
@@ -172,8 +173,11 @@
     </div>
   </dialog>
 
+  <dialog id="migrationDialog" aria-label="Import existing HoopTrack data"><div class="dialog-card"><div class="eyebrow">HOOPTRACK CLOUD</div><h2>Bring this device's stats with you?</h2><p id="migrationCounts" class="muted"></p><p class="muted small">Import keeps this local copy and securely adds its player, league, and game data to your Google account. Player photos and generated graphics stay on this device.</p><div class="button-row"><button id="migrationImportBtn" class="primary" type="button">Import my data</button><button id="migrationFreshBtn" class="secondary" type="button">Start fresh</button></div></div></dialog>
+
   <input id="hiddenRestore" type="file" class="hidden">
-  <script src="./graphic-renderer.js?v=2.2.0" defer></script>
-  <script src="./app.js?v=2.2.0" defer></script>
+  <script src="./graphic-renderer.js?v=2.3.0" defer></script>
+  <script type="module" src="./cloud-sync.js?v=2.3.0"></script>
+  <script src="./app.js?v=2.3.0" defer></script>
 </body>
 </html>

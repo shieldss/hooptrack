@@ -1,4 +1,4 @@
-# HoopTrack v2.0
+# HoopTrack v2.3.0
 
 HoopTrack is a mobile-first, offline-capable basketball stat tracker for one player. This release is designed to deploy directly to GitHub Pages from a repository root.
 
@@ -27,6 +27,7 @@ HoopTrack is a mobile-first, offline-capable basketball stat tracker for one pla
 - CSV export for Excel / Google Sheets
 - Android native Share sheet support
 - Offline PWA support
+- Optional Google sign-in and Firestore cloud sync, with local-data migration
 
 ## GitHub Pages deployment
 
@@ -53,6 +54,10 @@ Before switching permanently:
 4. Open the GitHub Pages version.
 5. Go to **Settings → Data → Restore JSON** and select the backup.
 
+## Cloud sync
+
+Cloud sync is optional. Configure Firebase by following [FIREBASE_SETUP.md](./FIREBASE_SETUP.md). The app continues to work fully offline before and after configuration.
+
 ## Data storage
 
-HoopTrack stores its working data in browser local storage. GitHub Pages hosts only the application files; game data is not uploaded to GitHub. Use the JSON Backup feature regularly if the season data is important.
+HoopTrack stores its working data in browser local storage. When Google sign-in is configured and used, player details, settings, leagues, games, notes, and achievements are securely copied to that user's Firestore area. Player photos and generated graphics remain only on the device. Use the JSON Backup feature regularly if the season data is important.

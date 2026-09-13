@@ -68,6 +68,19 @@ button {
     z-index: 50
 }
 
+.topbar-actions { display: flex; align-items: center; gap: 10px }
+.cloud-status { display: inline-flex; align-items: center; gap: 5px; color: var(--muted); font-size: .76rem; font-weight: 750; white-space: nowrap }
+.cloud-status[data-state="synced"] { color: var(--good) }
+.cloud-status[data-state="saving"] { color: var(--accent2) }
+.cloud-status[data-state="error"] { color: var(--danger) }
+.cloud-account .card-head { align-items: flex-start }
+.cloud-account .card-head > span { max-width: 300px; text-align: right }
+.cloud-profile { display: flex; align-items: center; gap: 12px; padding-top: 4px }
+.cloud-profile .text-btn { margin-left: auto }
+.cloud-avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; background: var(--panel2); border: 1px solid var(--border) }
+.google-signin { display: inline-flex; align-items: center; gap: 10px; background: var(--panel); color: var(--text) }
+.google-signin span { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: #fff; color: #4285f4; font-weight: 900; font-family: Arial, sans-serif }
+
 .brand-wrap {
     display: flex;
     align-items: center;
@@ -822,6 +835,11 @@ dialog::backdrop {
     .live.stat-grid {
         grid-template-columns: repeat(4, 1fr)
     }
+}
+
+@media(max-width:420px) {
+  .cloud-status { font-size: .68rem }
+  .cloud-account .card-head > span { max-width: 160px }
 }
 
 @media(max-width:420px) {
