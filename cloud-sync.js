@@ -197,7 +197,9 @@ async function startSignIn() {
       catch (error) { if (error.code === 'auth/popup-blocked') await authSdk.signInWithRedirect(auth, provider); else throw error; }
     }
   } catch (error) {
-    if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') status('error', 'Google sign-in could not be completed. Please try again.');
+    if (error.code === 'auth/unauthorized-domain') status('error', 'Google sign-in needs shieldss.github.io added in Firebase Authorized domains.');
+    else if (error.code === 'auth/operation-not-allowed') status('error', 'Enable Google in Firebase Authentication before signing in.');
+    else if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') status('error', 'Google sign-in could not be completed. Please try again.');
   }
 }
 
